@@ -6,6 +6,7 @@ import connectFour.Coordinates;
 import connectFour.board.Board;
 
 public class DetermineGameState {
+    private final static int NUMBER_CIRCLES_FOR_WIN = 4;
 
     public GameState checkGameState(Board board) {
         if(checkVerticalCells(board) != GameState.PLAYING){
@@ -68,17 +69,27 @@ public class DetermineGameState {
     }
 
     private boolean checkWin(int startRow, int startColumn, int deltaRow, int deltaColumn, Board board) {
-        Circle firstCircle = board.getCircle(new Coordinates(startRow, startColumn));
-        if(firstCircle == null){
-            return false;
-        }
-        for (int i = 1; i < 4 ; i++) {
-            Coordinates nextCoordinates = new Coordinates(startRow + i * deltaRow, startColumn + i * deltaColumn);
-            Circle nextCircle = board.getCircle(nextCoordinates);
-            if(nextCircle == null || !nextCircle.getColor().equals(firstCircle.getColor())){
-                return false;
+        Coordinates firstCoordinates = new Coordinates(startRow, startColumn);
+        if (!board.isCellEmpty(firstCoordinates)) {
+            Circle firstCircle = board.getCircle(firstCoordinates);
+
+            for (int i = 1; i < NUMBER_CIRCLES_FOR_WIN; i++) {
+                int newRow = startRow + i * deltaRow;
+                int newColumn = startColumn + i * deltaColumn;
+                Coordinates nextCoordinates = new Coordinates(newRow, newColumn);
+
+                if (board.isCellEmpty(nextCoordinates)) {
+                    return false;
+                }
+
+                Circle nextCircle = board.getCircle(nextCoordinates);
+                if (!nextCircle.getColor().equals(firstCircle.getColor())) {
+                    return false;
+                }
             }
+            return true;
         }
-        return true;
+        return false;
     }
+
 }
